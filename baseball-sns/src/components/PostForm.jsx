@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const PostForm = () => {
   const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(content);
+    setIsLoading(true);
+    
+    try {
+      await supabase.from('posts').insert([{ content: content }]);
+      setContent('');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -18,8 +29,8 @@ const PostForm = () => {
         onChange={(e) => setContent(e.target.value)}
       />
       <br />
-      <button type="submit">
-        投稿する
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? '投稿中...' : '投稿する'}
       </button>
     </form>
   );
