@@ -1,39 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Toolbar } from '@mui/material'
-import Header from './components/Header'
-import PostForm from './components/PostForm'
-import Timeline from './components/Timeline'
-import { supabase } from './lib/supabaseClient'
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Toolbar from '@mui/material/Toolbar';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import './App.css';
 
 function App() {
-  const [posts, setPosts] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState('');
-  const [filter, setFilter] = useState('all');
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const { data } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-        setPosts(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchPosts();
-  }, []);
-
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <BrowserRouter>
       <Header />
-      <Toolbar />
-      <PostForm />
-      <Timeline posts={posts} selectedTeam={selectedTeam} onTeamChange={setSelectedTeam} filter={filter} onFilterChange={setFilter} />
-    </Container>
-  )
+      <Toolbar /> {/* ヘッダーの高さ分コンテンツをオフセットするためのダミー */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
