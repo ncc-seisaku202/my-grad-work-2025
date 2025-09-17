@@ -10,7 +10,16 @@ import './index.css'
 import App from './App.jsx'
 
 const darkTheme = createTheme({
-  palette: { mode: 'dark' },
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#4caf50',
+    },
+    background: {
+      default: '#1a202c',
+      paper: '#2c3e50',
+    },
+  },
 })
 
 createRoot(document.getElementById('root')).render(
