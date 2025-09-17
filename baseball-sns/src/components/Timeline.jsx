@@ -1,16 +1,18 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
+import PostCard from './PostCard';
 
 const Timeline = ({ posts }) => {
   return (
-    <div>
+    <Box>
       {posts && posts.length > 0 ? (
         posts.map((post) => (
-          <p key={post.id}>{post.content}</p>
+          <PostCard key={post.id} post={post} />
         ))
       ) : (
-        <p>投稿はまだありません</p>
+        <Typography>投稿はまだありません</Typography>
       )}
-    </div>
+    </Box>
   );
 };
 
