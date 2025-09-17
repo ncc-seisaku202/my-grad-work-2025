@@ -7,6 +7,8 @@ import { supabase } from './lib/supabaseClient'
 
 function App() {
   const [posts, setPosts] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -29,7 +31,7 @@ function App() {
       <Header />
       <Toolbar />
       <PostForm />
-      <Timeline posts={posts} />
+      <Timeline posts={posts} selectedTeam={selectedTeam} onTeamChange={setSelectedTeam} filter={filter} onFilterChange={setFilter} />
     </Container>
   )
 }
