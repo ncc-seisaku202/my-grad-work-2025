@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container } from '@mui/material'
+import { Container, Toolbar } from '@mui/material'
 import Header from './components/Header'
 import PostForm from './components/PostForm'
 import Timeline from './components/Timeline'
@@ -27,6 +27,7 @@ function App() {
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Header />
+      <Toolbar />
       <PostForm />
       <Timeline posts={posts} />
     </Container>
