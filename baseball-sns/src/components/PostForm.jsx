@@ -32,7 +32,7 @@ const PostForm = () => {
         onChange={(e) => setContent(e.target.value)}
         sx={{ mb: 2 }}
       />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <Button 
           type="submit" 
           variant="contained" 
