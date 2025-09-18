@@ -7,11 +7,27 @@ import {
   Button,
   Link,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+      if (error) throw error;
+      navigate('/');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -26,7 +42,7 @@ const LoginPage = () => {
         <Typography component="h1" variant="h5">
           ログイン
         </Typography>
-        <Box component="form" sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
