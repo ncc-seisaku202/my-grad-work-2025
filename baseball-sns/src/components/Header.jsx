@@ -1,8 +1,18 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 const Header = () => {
+  const { session } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
+
   return (
     <AppBar position="fixed">
       <Toolbar>
@@ -13,9 +23,15 @@ const Header = () => {
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
         <Box>
-          <Button color="inherit" component={RouterLink} to="/login">
-            ログイン
-          </Button>
+          {session ? (
+            <Button color="inherit" onClick={handleLogout}>
+              ログアウト
+            </Button>
+          ) : (
+            <Button color="inherit" component={RouterLink} to="/login">
+              ログイン
+            </Button>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
