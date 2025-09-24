@@ -2,18 +2,32 @@ import React, { useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
-const PostForm = () => {
+const PostForm = ({ onPostSuccess }) => {
+  const { session } = useAuth();
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!session) {
+      alert('ログインしてください');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      await supabase.from('posts').insert([{ content: content }]);
+      await supabase.from('posts').insert([{
+        content: content,
+        user_id: session.user.id
+      }]);
       setContent('');
+      if (onPostSuccess) {
+        onPostSuccess();
+      }
     } catch (error) {
       console.error(error);
     } finally {

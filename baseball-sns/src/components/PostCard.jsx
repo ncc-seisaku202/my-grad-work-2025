@@ -8,11 +8,11 @@ const PostCard = ({ post }) => {
         {/* ユーザー情報エリア */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Typography fontWeight="bold">
-            （将来の）ユーザー名
+            {post?.profiles?.username || '匿名ユーザー'}
           </Typography>
-          <Chip 
-            label="（応援球団）" 
-            size="small" 
+          <Chip
+            label={post?.profiles?.favorite_team || '未設定'}
+            size="small"
             sx={{ ml: 1 }}
           />
           <Typography 
