@@ -28,6 +28,18 @@ const PostCard = ({ post }) => {
         <Typography sx={{ mt: 1 }}>
           {post.content}
         </Typography>
+        
+        {/* タグ表示エリア */}
+        {post.tags && (
+          <Box sx={{ mt: 1 }}>
+            <Chip
+              label={post.tags ? post.tags.name : ''}
+              size="small"
+              variant="outlined"
+              color="primary"
+            />
+          </Box>
+        )}
       </CardContent>
 
       {/* アクションボタンエリア（将来用） */}

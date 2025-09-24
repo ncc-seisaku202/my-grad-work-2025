@@ -18,7 +18,7 @@ const HomePage = () => {
     try {
       const { data, error } = await supabase
         .from('posts')
-        .select('*, profiles ( username, favorite_team )')
+        .select('*, profiles ( username, favorite_team ), tags ( * )')
         .order('created_at', { ascending: false });
 
       if (error) {
