@@ -11,6 +11,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 const SignUpPage = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -21,6 +22,11 @@ const SignUpPage = () => {
       const { error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          data: {
+            username: username
+          }
+        }
       });
       if (error) throw error;
       alert('登録が完了しました。ログインページに移動します。');
@@ -48,11 +54,22 @@ const SignUpPage = () => {
             margin="normal"
             required
             fullWidth
+            id="username"
+            label="表示名"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             id="email"
             label="メールアドレス"
             name="email"
             autoComplete="email"
-            autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />

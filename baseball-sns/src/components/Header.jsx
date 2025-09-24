@@ -24,9 +24,14 @@ const Header = () => {
         <Box sx={{ flexGrow: 1 }} />
         <Box>
           {session ? (
-            <Button color="inherit" onClick={handleLogout}>
-              ログアウト
-            </Button>
+            <>
+              <Button color="inherit" component={RouterLink} to="/profile">
+                プロフィール
+              </Button>
+              <Button color="inherit" onClick={handleLogout}>
+                ログアウト
+              </Button>
+            </>
           ) : (
             <Button color="inherit" component={RouterLink} to="/login">
               ログイン
