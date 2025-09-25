@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, Typography, Box, Chip, CardActions, IconButton, Badge } from '@mui/material';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { supabase } from '../lib/supabaseClient';
@@ -6,33 +6,8 @@ import { useAuth } from '../context/AuthContext';
 
 const PostCard = ({ post }) => {
   const [highlightCount, setHighlightCount] = useState(post.highlight_count || 0);
-  const [isHighlighted, setIsHighlighted] = useState(false);
+  const [isHighlighted, setIsHighlighted] = useState(post.is_highlighted_by_user || false);
   const { session } = useAuth();
-
-  // 初期表示時に自分がハイライトしているかチェック
-  useEffect(() => {
-    const checkHighlightStatus = async () => {
-      if (!session?.user?.id || !post.id) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('highlights')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .eq('post_id', post.id)
-          .single();
-
-        if (!error && data) {
-          setIsHighlighted(true);
-        }
-      } catch {
-        // レコードが存在しない場合はエラーになるが、それは正常
-        console.log('No highlight found for this post');
-      }
-    };
-
-    checkHighlightStatus();
-  }, [session?.user?.id, post.id]);
 
   const handleHighlight = async () => {
     if (!session?.user?.id) return;
@@ -46,7 +21,7 @@ const PostCard = ({ post }) => {
 
         if (!error) {
           setHighlightCount(prev => prev + 1);
-          setIsHighlighted(true);
+          setIsHighlighted(!isHighlighted);
         }
       } else {
         // ハイライトを削除
@@ -58,7 +33,7 @@ const PostCard = ({ post }) => {
 
         if (!error) {
           setHighlightCount(prev => prev - 1);
-          setIsHighlighted(false);
+          setIsHighlighted(!isHighlighted);
         }
       }
     } catch (error) {
@@ -73,7 +48,7 @@ const PostCard = ({ post }) => {
 
         if (!deleteError) {
           setHighlightCount(prev => prev - 1);
-          setIsHighlighted(false);
+          setIsHighlighted(!isHighlighted);
         }
       } else {
         console.error('Error handling highlight:', error);
@@ -86,16 +61,16 @@ const PostCard = ({ post }) => {
         {/* ユーザー情報エリア */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Typography fontWeight="bold">
-            {post?.profiles?.username || '匿名ユーザー'}
+            {post.profiles?.username || '匿名ユーザー'}
           </Typography>
           <Chip
-            label={post?.profiles?.favorite_team || '未設定'}
+            label={post.profiles?.favorite_team || '未設定'}
             size="small"
             sx={{ ml: 1 }}
           />
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
+          <Typography
+            variant="caption"
+            color="text.secondary"
             sx={{ ml: 'auto' }}
           >
             {post.created_at}
@@ -111,7 +86,7 @@ const PostCard = ({ post }) => {
         {post.tags && (
           <Box sx={{ mt: 1 }}>
             <Chip
-              label={post.tags ? post.tags.name : ''}
+              label={post.tags.name || ''}
               size="small"
               variant="outlined"
               color="primary"
