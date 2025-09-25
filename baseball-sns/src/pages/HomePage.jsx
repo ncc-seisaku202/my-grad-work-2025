@@ -17,7 +17,7 @@ const HomePage = () => {
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
-        .from('posts')
+        .from('post_highlights_view')
         .select('*, profiles ( username, favorite_team ), tags ( * )')
         .order('created_at', { ascending: false });
 

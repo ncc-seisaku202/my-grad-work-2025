@@ -1,7 +1,85 @@
-import React from 'react';
-import { Card, CardContent, Typography, Box, Chip, CardActions } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, Typography, Box, Chip, CardActions, IconButton, Badge } from '@mui/material';
+import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
+import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 const PostCard = ({ post }) => {
+  const [highlightCount, setHighlightCount] = useState(post.highlight_count || 0);
+  const [isHighlighted, setIsHighlighted] = useState(false);
+  const { session } = useAuth();
+
+  // 初期表示時に自分がハイライトしているかチェック
+  useEffect(() => {
+    const checkHighlightStatus = async () => {
+      if (!session?.user?.id || !post.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('highlights')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .eq('post_id', post.id)
+          .single();
+
+        if (!error && data) {
+          setIsHighlighted(true);
+        }
+      } catch {
+        // レコードが存在しない場合はエラーになるが、それは正常
+        console.log('No highlight found for this post');
+      }
+    };
+
+    checkHighlightStatus();
+  }, [session?.user?.id, post.id]);
+
+  const handleHighlight = async () => {
+    if (!session?.user?.id) return;
+
+    try {
+      if (!isHighlighted) {
+        // ハイライトを追加
+        const { error } = await supabase
+          .from('highlights')
+          .insert({ user_id: session.user.id, post_id: post.id });
+
+        if (!error) {
+          setHighlightCount(prev => prev + 1);
+          setIsHighlighted(true);
+        }
+      } else {
+        // ハイライトを削除
+        const { error } = await supabase
+          .from('highlights')
+          .delete()
+          .eq('user_id', session.user.id)
+          .eq('post_id', post.id);
+
+        if (!error) {
+          setHighlightCount(prev => prev - 1);
+          setIsHighlighted(false);
+        }
+      }
+    } catch (error) {
+      if (error.code === '23505') {
+        // ユニーク制約違反 = すでにハイライト済み
+        // ハイライトを削除
+        const { error: deleteError } = await supabase
+          .from('highlights')
+          .delete()
+          .eq('user_id', session.user.id)
+          .eq('post_id', post.id);
+
+        if (!deleteError) {
+          setHighlightCount(prev => prev - 1);
+          setIsHighlighted(false);
+        }
+      } else {
+        console.error('Error handling highlight:', error);
+      }
+    }
+  };
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
@@ -42,10 +120,18 @@ const PostCard = ({ post }) => {
         )}
       </CardContent>
 
-      {/* アクションボタンエリア（将来用） */}
+      {/* アクションボタンエリア */}
       <CardActions>
-        <Box>
-          {/* 将来のアクションボタン用 */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton
+            onClick={handleHighlight}
+            color={isHighlighted ? 'primary' : 'default'}
+            disabled={!session?.user?.id}
+          >
+            <Badge badgeContent={highlightCount} color="primary">
+              {isHighlighted ? <StarIcon /> : <StarBorderIcon />}
+            </Badge>
+          </IconButton>
         </Box>
       </CardActions>
     </Card>
