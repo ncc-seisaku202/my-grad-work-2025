@@ -25,6 +25,12 @@ const Header = () => {
         <Box>
           {session ? (
             <>
+              <Button color="inherit" component={RouterLink} to="/predictions/new">
+                順位予想
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/predictions">
+                みんなの予想
+              </Button>
               <Button color="inherit" component={RouterLink} to="/profile">
                 プロフィール
               </Button>
