@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, ButtonGroup, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { motion } from 'framer-motion';
 import PostCard from './PostCard';
 
 const Timeline = ({ posts, selectedTeam, onTeamChange, filter, onFilterChange, sortBy, onSortByChange }) => {
@@ -71,9 +72,15 @@ const Timeline = ({ posts, selectedTeam, onTeamChange, filter, onFilterChange, s
 
       {/* 投稿リスト */}
       {posts && posts.length > 0 ? (
-        posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </motion.div>
       ) : (
         <Typography>投稿はまだありません</Typography>
       )}

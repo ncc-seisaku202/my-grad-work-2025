@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Typography, Box, Chip, CardActions, IconButton, Badge } from '@mui/material';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+
+const MotionIconButton = motion(IconButton);
 
 const PostCard = ({ post }) => {
   const [highlightCount, setHighlightCount] = useState(post.highlight_count || 0);
@@ -98,15 +101,18 @@ const PostCard = ({ post }) => {
       {/* アクションボタンエリア */}
       <CardActions>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton
+          <MotionIconButton
             onClick={handleHighlight}
             color={isHighlighted ? 'primary' : 'default'}
             disabled={!session?.user?.id}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <Badge badgeContent={highlightCount} color="primary">
               {isHighlighted ? <StarIcon /> : <StarBorderIcon />}
             </Badge>
-          </IconButton>
+          </MotionIconButton>
         </Box>
       </CardActions>
     </Card>
