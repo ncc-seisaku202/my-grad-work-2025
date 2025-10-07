@@ -281,7 +281,7 @@ const PredictionPage = () => {
       </Typography>
       
       <DndContext onDragEnd={handleDragEnd}>
-        <Box sx={{ display: 'flex', gap: 4, mt: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4, mt: 4 }}>
           {/* 左側：球団リスト */}
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" gutterBottom>

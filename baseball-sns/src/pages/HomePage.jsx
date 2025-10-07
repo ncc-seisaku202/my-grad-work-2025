@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import PostForm from '../components/PostForm';
 import Timeline from '../components/Timeline';
-import { Container } from '@mui/material';
+import { Container, CircularProgress, Box } from '@mui/material';
 
 
 const HomePage = () => {
@@ -10,12 +10,14 @@ const HomePage = () => {
   const [selectedTeam, setSelectedTeam] = useState('');
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPosts();
   }, [sortBy, selectedTeam, filter]);
 
   const fetchPosts = async () => {
+    setLoading(true);
     try {
       let query;
 
@@ -60,21 +62,29 @@ const HomePage = () => {
       setPosts(processedData);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <PostForm onPostSuccess={fetchPosts} />
-      <Timeline
-        posts={posts}
-        selectedTeam={selectedTeam}
-        onTeamChange={setSelectedTeam}
-        filter={filter}
-        onFilterChange={setFilter}
-        sortBy={sortBy}
-        onSortByChange={setSortBy}
-      />
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Timeline
+          posts={posts}
+          selectedTeam={selectedTeam}
+          onTeamChange={setSelectedTeam}
+          filter={filter}
+          onFilterChange={setFilter}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+        />
+      )}
     </Container>
   );
 };

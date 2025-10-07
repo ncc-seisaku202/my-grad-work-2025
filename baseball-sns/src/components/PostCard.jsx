@@ -81,7 +81,7 @@ const PostCard = ({ post }) => {
         </Box>
 
         {/* 投稿本文エリア */}
-        <Typography sx={{ mt: 1 }}>
+        <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
           {post.content}
         </Typography>
         

@@ -8,7 +8,14 @@ const Timeline = ({ posts, selectedTeam, onTeamChange, filter, onFilterChange, s
   return (
     <Box>
       {/* ソートとフィルターの操作UI */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 2,
+        mb: 2
+      }}>
         {/* 左側: ソートボタン群 */}
         <ButtonGroup variant="outlined" size="small">
           <Button
