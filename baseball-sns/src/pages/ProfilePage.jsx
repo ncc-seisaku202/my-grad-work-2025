@@ -8,6 +8,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [favoriteTeam, setFavoriteTeam] = useState('');
+  const [bio, setBio] = useState('');
 
   useEffect(() => {
     const getProfile = async () => {
@@ -17,7 +18,7 @@ const ProfilePage = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('username, favorite_team')
+          .select('username, favorite_team, bio')
           .eq('id', user.id)
           .single();
 
@@ -26,6 +27,7 @@ const ProfilePage = () => {
         if (data) {
           setUsername(data.username || '');
           setFavoriteTeam(data.favorite_team || '');
+          setBio(data.bio || '');
         }
       } catch (error) {
         console.error('プロフィール取得エラー:', error);
@@ -49,6 +51,7 @@ const ProfilePage = () => {
           id: user.id,
           username,
           favorite_team: favoriteTeam,
+          bio: bio,
           updated_at: new Date()
         });
 
@@ -104,6 +107,16 @@ const ProfilePage = () => {
             <MenuItem value="baystars">横浜DeNAベイスターズ</MenuItem>
           </Select>
         </FormControl>
+
+        <TextField
+          label="自己紹介"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          fullWidth
+          variant="outlined"
+          multiline
+          rows={4}
+        />
 
         <Button
           variant="contained"
