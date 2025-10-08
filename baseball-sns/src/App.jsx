@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import ProfilePage from './pages/ProfilePage';
+import UserProfilePage from './pages/UserProfilePage';
 import PredictionPage from './pages/PredictionPage';
 import PredictionListPage from './pages/PredictionListPage';
 import './App.css';
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="/predictions/new" element={<PredictionPage />} />
           <Route path="/predictions" element={<PredictionListPage />} />
         </Routes>
