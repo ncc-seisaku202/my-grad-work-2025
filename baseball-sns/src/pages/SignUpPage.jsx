@@ -6,6 +6,7 @@ import {
   TextField,
   Button,
   Link,
+  Alert,
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
@@ -14,11 +15,38 @@ const SignUpPage = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      return 'パスワードは8文字以上で、大文字、小文字、数字をそれぞれ1文字以上含めてください';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'パスワードは8文字以上で、大文字、小文字、数字をそれぞれ1文字以上含めてください';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'パスワードは8文字以上で、大文字、小文字、数字をそれぞれ1文字以上含めてください';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'パスワードは8文字以上で、大文字、小文字、数字をそれぞれ1文字以上含めてください';
+    }
+    return '';
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    // パスワードバリデーション
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    }
+    
     try {
+      setError(null);
       const { error } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -32,7 +60,7 @@ const SignUpPage = () => {
       alert('登録が完了しました。ログインページに移動します。');
       navigate('/login');
     } catch (error) {
-      alert(error.message);
+      setError(error.message);
     }
   };
 
@@ -49,6 +77,7 @@ const SignUpPage = () => {
         <Typography component="h1" variant="h5">
           新規登録
         </Typography>
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -83,7 +112,12 @@ const SignUpPage = () => {
             id="password"
             autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError(validatePassword(e.target.value));
+            }}
+            error={!!passwordError}
+            helperText={passwordError}
           />
           <Button
             type="submit"

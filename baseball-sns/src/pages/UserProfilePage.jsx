@@ -11,6 +11,7 @@ import {
   Paper
 } from '@mui/material';
 import UserPostList from '../components/UserPostList';
+import { Link as RouterLink } from 'react-router-dom';
 
 const UserProfilePage = () => {
   const { userId } = useParams();
@@ -60,6 +61,38 @@ const UserProfilePage = () => {
     return (
       <Container maxWidth="md" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
         <CircularProgress />
+      </Container>
+    );
+  }
+
+  // プロフィールが見つからない場合
+  if (!loading && !profile) {
+    return (
+      <Container component="main" maxWidth="sm">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h4" component="h1" gutterBottom>
+            ユーザーが見つかりません
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 4 }}>
+            このユーザーは存在しません。
+          </Typography>
+          <Button
+            component={RouterLink}
+            to="/"
+            variant="contained"
+            color="primary"
+          >
+            ホームページに戻る
+          </Button>
+        </Box>
       </Container>
     );
   }

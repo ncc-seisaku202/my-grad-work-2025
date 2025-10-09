@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
 import PredictionPage from './pages/PredictionPage';
 import PredictionListPage from './pages/PredictionListPage';
+import NotFoundPage from './pages/NotFoundPage';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="/predictions/new" element={<PredictionPage />} />
           <Route path="/predictions" element={<PredictionListPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

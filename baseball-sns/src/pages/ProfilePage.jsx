@@ -3,6 +3,8 @@ import { Container, Box, Typography, TextField, Button, FormControl, InputLabel,
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
+const MAX_BIO_LENGTH = 200;
+
 const ProfilePage = () => {
   const { session } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -116,6 +118,9 @@ const ProfilePage = () => {
           variant="outlined"
           multiline
           rows={4}
+          inputProps={{ maxLength: MAX_BIO_LENGTH }}
+          helperText={`${bio.length}/${MAX_BIO_LENGTH}`}
+          error={bio.length > MAX_BIO_LENGTH}
         />
 
         <Button
