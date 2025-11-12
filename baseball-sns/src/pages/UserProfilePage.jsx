@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -8,8 +8,10 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Paper
+  Paper,
+  ButtonGroup
 } from '@mui/material';
+import { Star as StarIcon } from '@mui/icons-material';
 import UserPostList from '../components/UserPostList';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -20,6 +22,8 @@ const UserProfilePage = () => {
   
   const [profile, setProfile] = useState(null);
   const [userPosts, setUserPosts] = useState(null);
+  const [totalHighlights, setTotalHighlights] = useState(0);
+  const [sortBy, setSortBy] = useState('created_at');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +48,19 @@ const UserProfilePage = () => {
           setProfile(data.profile);
           setUserPosts(data.posts || []);
         }
+
+        // 総ハイライト数を取得
+        try {
+          const { data: highlightData, error: highlightError } = await supabase.rpc('get_total_highlights_for_user', {
+            user_id_input: userId
+          });
+
+          if (highlightError) throw highlightError;
+          
+          setTotalHighlights(highlightData || 0);
+        } catch (highlightError) {
+          console.error('Error in highlight calculation:', highlightError);
+        }
       } catch (error) {
         console.error('Error in fetchUserData:', error);
       } finally {
@@ -56,6 +73,20 @@ const UserProfilePage = () => {
 
   // 自分のプロフィールかどうかを判定
   const isOwnProfile = session && session.user.id === userId;
+
+  // 表示用にソート済みの投稿データを作成
+  const sortedPosts = useMemo(() => {
+    if (!userPosts) return [];
+    
+    const posts = [...userPosts];
+    
+    if (sortBy === 'highlight_count') {
+      return posts.sort((a, b) => (b.highlight_count || 0) - (a.highlight_count || 0));
+    } else {
+      // デフォルトは created_at で降順ソート
+      return posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+  }, [userPosts, sortBy]);
 
   if (loading) {
     return (
@@ -109,6 +140,12 @@ const UserProfilePage = () => {
             <Typography variant="body1" color="text.secondary" gutterBottom>
               応援チーム: {profile?.favorite_team || '未設定'}
             </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <StarIcon sx={{ color: '#FFD700', mr: 0.5 }} />
+              <Typography variant="body1" color="text.secondary">
+                総ハイライト: {totalHighlights}
+              </Typography>
+            </Box>
             {profile?.bio && (
               <Typography variant="body2" sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
                 {profile.bio}
@@ -135,10 +172,26 @@ const UserProfilePage = () => {
 
       {/* 投稿一覧エリア */}
       <Box>
-        <Typography variant="h6" gutterBottom>
-          投稿一覧
-        </Typography>
-        <UserPostList posts={userPosts} />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">
+            投稿一覧
+          </Typography>
+          <ButtonGroup variant="outlined" size="small">
+            <Button
+              variant={sortBy === 'created_at' ? 'contained' : 'outlined'}
+              onClick={() => setSortBy('created_at')}
+            >
+              新着順
+            </Button>
+            <Button
+              variant={sortBy === 'highlight_count' ? 'contained' : 'outlined'}
+              onClick={() => setSortBy('highlight_count')}
+            >
+              ハイライト順
+            </Button>
+          </ButtonGroup>
+        </Box>
+        <UserPostList posts={sortedPosts} />
       </Box>
     </Container>
   );

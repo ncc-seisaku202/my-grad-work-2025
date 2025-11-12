@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 const MotionIconButton = motion(IconButton);
 
-const PostCard = ({ post, showUserInfo = true }) => {
+const PostCard = ({ post }) => {
   const [highlightCount, setHighlightCount] = useState(post.highlight_count || 0);
   const [isHighlighted, setIsHighlighted] = useState(post.is_highlighted_by_user || false);
   const { session } = useAuth();
@@ -63,30 +63,28 @@ const PostCard = ({ post, showUserInfo = true }) => {
     <Card sx={{ mb: 2 }}>
       <CardContent>
         {/* ユーザー情報エリア */}
-        {showUserInfo && (
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <RouterLink
-              to={`/users/${post.user_id}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <Typography fontWeight="bold">
-                {post.profiles?.username || '匿名ユーザー'}
-              </Typography>
-            </RouterLink>
-            <Chip
-              label={post.profiles?.favorite_team || '未設定'}
-              size="small"
-              sx={{ ml: 1 }}
-            />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ ml: 'auto' }}
-            >
-              {post.created_at}
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <RouterLink
+            to={`/users/${post.user_id}`}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <Typography fontWeight="bold">
+              {post.profiles?.username || '匿名ユーザー'}
             </Typography>
-          </Box>
-        )}
+          </RouterLink>
+          <Chip
+            label={post.profiles?.favorite_team || '未設定'}
+            size="small"
+            sx={{ ml: 1 }}
+          />
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ ml: 'auto' }}
+          >
+            {post.created_at}
+          </Typography>
+        </Box>
 
         {/* 投稿本文エリア */}
         <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
