@@ -28,8 +28,14 @@ const Header = () => {
               <Button color="inherit" component={RouterLink} to="/predictions/new">
                 順位予想
               </Button>
+              <Button color="inherit" component={RouterLink} to="/predictions/titles">
+                個人タイトル予想
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/predictions/titles/all">
+                タイトル予想一覧
+              </Button>
               <Button color="inherit" component={RouterLink} to="/predictions">
-                みんなの予想
+                みんなの順位予想
               </Button>
               <Button color="inherit" component={RouterLink} to="/profile">
                 プロフィール

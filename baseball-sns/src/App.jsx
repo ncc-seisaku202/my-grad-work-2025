@@ -10,6 +10,8 @@ import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
 import PredictionPage from './pages/PredictionPage';
 import PredictionListPage from './pages/PredictionListPage';
+import TitlePredictionPage from './pages/TitlePredictionPage';
+import TitlePredictionListPage from './pages/TitlePredictionListPage';
 import NotFoundPage from './pages/NotFoundPage';
 import './App.css';
 
@@ -27,6 +29,8 @@ function App() {
           <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="/predictions/new" element={<PredictionPage />} />
           <Route path="/predictions" element={<PredictionListPage />} />
+          <Route path="/predictions/titles" element={<TitlePredictionPage />} />
+          <Route path="/predictions/titles/all" element={<TitlePredictionListPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
