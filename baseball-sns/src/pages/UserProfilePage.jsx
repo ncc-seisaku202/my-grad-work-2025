@@ -25,6 +25,9 @@ const UserProfilePage = () => {
   const [totalHighlights, setTotalHighlights] = useState(0);
   const [sortBy, setSortBy] = useState('created_at');
   const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -49,17 +52,40 @@ const UserProfilePage = () => {
           setUserPosts(data.posts || []);
         }
 
-        // 総ハイライト数を取得
+        // 総ハイライト数、フォロワー数、フォロー数を並行取得
         try {
-          const { data: highlightData, error: highlightError } = await supabase.rpc('get_total_highlights_for_user', {
-            user_id_input: userId
-          });
+          const [highlightResult, followerResult, followingResult] = await Promise.all([
+            supabase.rpc('get_total_highlights_for_user', { user_id_input: userId }),
+            supabase.rpc('get_follower_count', { user_id_input: userId }),
+            supabase.rpc('get_following_count', { user_id_input: userId })
+          ]);
 
-          if (highlightError) throw highlightError;
+          if (highlightResult.error) throw highlightResult.error;
+          if (followerResult.error) throw followerResult.error;
+          if (followingResult.error) throw followingResult.error;
           
-          setTotalHighlights(highlightData || 0);
-        } catch (highlightError) {
-          console.error('Error in highlight calculation:', highlightError);
+          setTotalHighlights(highlightResult.data || 0);
+          setFollowerCount(followerResult.data || 0);
+          setFollowingCount(followingResult.data || 0);
+        } catch (error) {
+          console.error('Error fetching counts:', error);
+        }
+
+        // フォロー状態を確認
+        if (session && session.user.id !== userId) {
+          try {
+            const { count, error: followError } = await supabase
+              .from('follows')
+              .select('*', { count: 'exact' })
+              .eq('follower_id', session.user.id)
+              .eq('following_id', userId);
+
+            if (followError) throw followError;
+            
+            setIsFollowing(count > 0);
+          } catch (followError) {
+            console.error('Error checking follow status:', followError);
+          }
         }
       } catch (error) {
         console.error('Error in fetchUserData:', error);
@@ -69,7 +95,42 @@ const UserProfilePage = () => {
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [userId, session]);
+
+  // フォロー関数
+  const handleFollow = async () => {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .insert({
+          follower_id: session.user.id,
+          following_id: userId
+        });
+
+      if (error) throw error;
+      
+      setIsFollowing(true);
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
+  };
+
+  // アンフォロー関数
+  const handleUnfollow = async () => {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', session.user.id)
+        .eq('following_id', userId);
+
+      if (error) throw error;
+      
+      setIsFollowing(false);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+    }
+  };
 
   // 自分のプロフィールかどうかを判定
   const isOwnProfile = session && session.user.id === userId;
@@ -151,6 +212,16 @@ const UserProfilePage = () => {
                 {profile.bio}
               </Typography>
             )}
+            
+            {/* フォロー数とフォロワー数 */}
+            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                <strong>{followingCount}</strong> フォロー
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                <strong>{followerCount}</strong> フォロワー
+              </Typography>
+            </Box>
           </Box>
           
           {/* ボタンエリア */}
@@ -163,8 +234,12 @@ const UserProfilePage = () => {
                 プロフィールを編集
               </Button>
             ) : (
-              // 将来のフォローボタン用プレースホルダー
-              <Box />
+              <Button
+                variant={isFollowing ? "outlined" : "contained"}
+                onClick={isFollowing ? handleUnfollow : handleFollow}
+              >
+                {isFollowing ? "フォロー中" : "フォローする"}
+              </Button>
             )}
           </Box>
         </Box>
